@@ -2,6 +2,8 @@
 
 **WebBerricht** is a system designed for managing medical appointments, built following the hexagonal architecture. It connects to the external **Alephoo API** to obtain and manage appointments, patient, and professional data, as well as to cancel appointments. The data retrieved is converted into messages and stored locally in an **SQLite** database.
 
+The stored messages are subsequently used to send SMS notifications through **SMS Masivo** to each patient for appointment confirmation. The system awaits a response from the patient, which can automatically cancel the appointment if needed. This process helps to save time and effort for the company by automating appointment management and reducing manual intervention.
+
 ## Architecture
 
 The project is based on **hexagonal architecture** (also known as ports and adapters), which ensures a clear separation between business logic and external infrastructures (such as APIs and databases). This approach facilitates scalability and system maintainability.
@@ -80,7 +82,7 @@ WebBerricht offers several **endpoints** to interact with the system:
 - **Express.js** for routing and HTTP request handling.
 - **SQLite** as the local database.
 - **Axios** to interact with the external Alephoo API.
-- **Twilio** (or any other SMS provider) to send SMS messages.
+- **SMSMasivos** (or any other SMS provider) to send SMS messages.
 
 ## Conclusion
 
