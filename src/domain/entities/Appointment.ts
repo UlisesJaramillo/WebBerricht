@@ -8,6 +8,7 @@ export class Appointment {
     public hora: string,
     public paciente: Pacient | null,
     public professional: Professional | null,
-    public motivo: string
+    public motivo: string,
+    public patientLink: string
   ) {}
 }

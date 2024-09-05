@@ -1,3 +1,5 @@
+import { Message } from "../entities/Message";
+
 export interface MessageRepository {
   setResponse(
     cancelAppointment: string,
@@ -5,4 +7,7 @@ export interface MessageRepository {
     phoneNumber: string
   ): Promise<Boolean>;
   getIdAppointment(phoneNumber: string): Promise<string>;
+  updateMessage(message: Message): Promise<boolean>;
+  countMessages(idAppointment: string): Promise<number>;
+  saveMessages(message: Message): Promise<boolean>;
 }

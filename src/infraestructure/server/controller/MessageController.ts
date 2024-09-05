@@ -35,7 +35,6 @@ export class MessageController {
     const date = req.params.fecha;
     try {
       this.sendSms.execute(date).then((data) => {
-        //console.log(data);
         res.status(200).json({ ok: "ok", respuesta: data });
       });
     } catch (error) {

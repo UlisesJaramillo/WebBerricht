@@ -5,5 +5,5 @@ export interface AppointmentApi {
   getAppointmentsDate(date: string): Promise<Appointment[]> | [];
   getAppointment(id: number): Promise<Appointment> | [];
   cancelAppointment(id: string): Promise<boolean>;
-  getPacient(link: string): Promise<Pacient | null>;
+  getPacient(appointments: Appointment[]): Promise<Appointment[]>;
 }

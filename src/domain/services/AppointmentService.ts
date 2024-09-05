@@ -11,6 +11,10 @@ export class AppointmentService {
     console.log("Servicio creado: AppointmentService");
   }
 
+  async getPatient(appointments: Appointment[]): Promise<Appointment[]> {
+    return this.appointmentApi.getPacient(appointments);
+  }
+
   async getAppointmentsFilteredFromDB(
     date: string,
     yesterday: string
@@ -37,16 +41,6 @@ export class AppointmentService {
   async getAppointmentsDate(date: string): Promise<Appointment[]> {
     console.log("en el servicio!");
     return await this.appointmentApi.getAppointmentsDate(date);
-  }
-
-  async countAppointment(idAppointment: string): Promise<number> {
-    return await this.appointmentRepository.countAppointment(idAppointment);
-  }
-  async saveAppointments(messages: Message): Promise<boolean> {
-    return await this.appointmentRepository.saveAppointments(messages);
-  }
-  async updateAppointment(message: Message): Promise<boolean> {
-    return await this.appointmentRepository.updateAppointment(message);
   }
 
   async cancelAppointment(idAppointment: string): Promise<boolean> {

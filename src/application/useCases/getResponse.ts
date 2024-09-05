@@ -6,7 +6,6 @@ export class GetResponse {
     private messageService: MessageService,
     private appointmentService: AppointmentService
   ) {
-    this.messageService = messageService;
     console.log("clase creada: GetResponse");
   }
 
@@ -33,7 +32,6 @@ export class GetResponse {
     const idAppointment: string = await this.messageService.getIdAppointment(
       phoneNumber
     );
-    //if response is "NO" ---> cancel appointment
     if (cancelado == "no") {
       this.appointmentService.cancelAppointment(idAppointment);
     }

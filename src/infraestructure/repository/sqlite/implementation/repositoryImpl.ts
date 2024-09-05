@@ -8,9 +8,13 @@ export class RepositoryImpl
   implements AppointmentRepository, MessageRepository
 {
   private db: sqlite3.Database;
+
   constructor() {
+    // Initialize the SQLite database connection
     this.db = new sqlite3.Database("./database.db");
   }
+
+  // Retrieve the appointment ID based on the phone number
   async getIdAppointment(phoneNumber: string): Promise<string> {
     return await new Promise((resolve, reject) => {
       this.db.all(
@@ -18,15 +22,17 @@ export class RepositoryImpl
         [`%${phoneNumber}%`],
         (err, rows: Message[]) => {
           if (err) {
-            console.error("Error en la consulta:", err);
-            reject(err); // Rechazar la promesa si hay un error
+            console.error("Error during query:", err);
+            reject(err); // Reject the promise if there is an error
           } else {
-            resolve(rows[0].idTurno);
+            resolve(rows[0].idTurno); // Resolve the appointment ID
           }
         }
       );
     });
   }
+
+  // Retrieve appointments filtered by date and other conditions
   async getApointmentsByDateFiltered(
     date: string,
     yesterday: string
@@ -38,19 +44,21 @@ export class RepositoryImpl
           [date, yesterday],
           (err, rows: Message[]) => {
             if (err) {
-              console.error("Error en la consulta:", err);
-              reject(err); // Rechazar la promesa si hay un error
+              console.error("Error during query:", err);
+              reject(err); // Reject the promise if there is an error
             } else {
-              resolve(rows);
+              resolve(rows); // Resolve with the filtered appointments
             }
           }
         );
       });
     } catch (error) {
-      console.error("Error en la consulta:", error);
+      console.error("Error during query:", error);
       return [];
     }
   }
+
+  // Retrieve appointments based on a specific date
   async getApointmentsByDate(date: string): Promise<Message[]> {
     try {
       return await new Promise((resolve, reject) => {
@@ -59,19 +67,21 @@ export class RepositoryImpl
           [`%${date}%`],
           (err, rows: Message[]) => {
             if (err) {
-              console.error("Error en la consulta:", err);
-              reject(err); // Rechazar la promesa si hay un error
+              console.error("Error during query:", err);
+              reject(err); // Reject the promise if there is an error
             } else {
-              resolve(rows);
+              resolve(rows); // Resolve with the appointments
             }
           }
         );
       });
     } catch (error) {
-      console.error("Error en la consulta:", error);
+      console.error("Error during query:", error);
       return [];
     }
   }
+
+  // Update the response for an appointment and patient based on phone number
   async setResponse(
     cancelAppointment: string,
     response: string,
@@ -83,15 +93,17 @@ export class RepositoryImpl
         [],
         (err, rows: Message[]) => {
           if (err) {
-            console.error("Error en la consulta:", err);
-            reject(false); // Rechazar la promesa si hay un error
+            console.error("Error during query:", err);
+            reject(false); // Reject the promise if there is an error
           } else {
-            resolve(true);
+            resolve(true); // Resolve true if the update was successful
           }
         }
       );
     });
   }
+
+  // Set the process date for appointments matching the given criteria
   async setProcessAppointment(
     date: string,
     processDate: string
@@ -103,62 +115,52 @@ export class RepositoryImpl
           [processDate, date],
           (err, rows: Message[]) => {
             if (err) {
-              console.error("Error en la consulta:", err);
-              reject(false); // Rechazar la promesa si hay un error
+              console.error("Error during query:", err);
+              reject(false); // Reject the promise if there is an error
             } else {
-              resolve(true);
+              resolve(true); // Resolve true if the update was successful
             }
           }
         );
       });
     } catch (error) {
-      console.error("Error en la consulta:", error);
+      console.error("Error during query:", error);
       return false;
     }
   }
+
+  // Retrieve appointments between two dates
   async getAppointmentBetwenDate(
     dateStart: string,
     dateEnd: string
   ): Promise<Appointment[] | null> {
     const apointments: Appointment[] = [];
-    //TODO: ver que la consulta devuelva una colección de objetos de un formato establecido
-    console.log("EN EL REPOSITORIO");
+    console.log("Inside the repository");
 
     console.log(apointments);
     return apointments;
   }
-  countAppointment(idAppointment: string): Promise<number> {
+
+  // Count the number of messages associated with an appointment
+  countMessages(idAppointment: string): Promise<number> {
     return new Promise((resolve, reject) => {
       this.db.all(
         "SELECT COUNT(*) AS count FROM messages WHERE idTurno = ?",
         [idAppointment],
         (err, row: any) => {
           if (err) {
-            console.error("Error en la consulta:", err);
-            return reject(err);
+            console.error("Error during query:", err);
+            return reject(err); // Reject the promise if there is an error
           }
-          console.log("Consulta realizada con éxito:", row[0].count);
-          resolve(row[0].count);
+          console.log("Query successful:", row[0].count);
+          resolve(row[0].count); // Resolve with the count of messages
         }
       );
     });
   }
-  async saveAppointments(message: Message): Promise<boolean> {
-    const messageObject = {
-      idTurno: message.idTurno,
-      paciente_nombre: message.paciente_nombre,
-      paciente_apellido: message.paciente_apellido,
-      medico_nombre: message.medico_nombre,
-      medico_apellido: message.medico_apellido,
-      turno_fecha: message.turno_fecha,
-      turno_hora: message.turno_hora,
-      paciente_celular: message.paciente_celular,
-      motivo: message.motivo,
-      fecha_procesado: message.fecha_procesado ?? null,
-      fecha_respuesta: message.fecha_respuesta ?? null,
-      cancela_turno: message.cancela_turno ?? null,
-    };
-    console.log("messageObjects --->", messageObject);
+
+  // Save a message to the database
+  async saveMessages(message: Message): Promise<boolean> {
     try {
       const query = `
       INSERT INTO messages (
@@ -184,24 +186,42 @@ export class RepositoryImpl
         message.paciente_celular,
         message.idTurno,
       ]);
-    } catch (error) {}
-    return new Promise(() => true);
+    } catch (error) {
+      return new Promise(() => false); // Return false in case of error
+    }
+    return new Promise(() => true); // Return true if the message is saved successfully
   }
-  updateAppointment(message: Message): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      const query = `
-        UPDATE messages
-        SET 
-          paciente_nombre = ?, 
-          paciente_apellido = ?, 
-          medico_nombre = ?, 
-          medico_apellido = ?, 
-          turno_fecha = ?, 
-          turno_hora = ?, 
-          paciente_celular = ?
-        WHERE idTurno = ?
-      `;
 
+  // Update a message's details, avoiding updates if patient data is unavailable
+  updateMessage(message: Message): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      // Check if patient data contains unavailable values
+      if (
+        message.paciente_nombre === "Nombre no disponible" ||
+        message.paciente_apellido === "Apellido no disponible" ||
+        message.paciente_celular === "teléfono no disponible"
+      ) {
+        console.log(
+          "Some patient data is unavailable. The message will not be updated."
+        );
+        return resolve(false); // Resolve false if data is unavailable
+      }
+
+      // SQL query to update the message
+      const query = `
+      UPDATE messages
+      SET 
+        paciente_nombre = ?, 
+        paciente_apellido = ?, 
+        medico_nombre = ?, 
+        medico_apellido = ?, 
+        turno_fecha = ?, 
+        turno_hora = ?, 
+        paciente_celular = ?
+      WHERE idTurno = ?
+    `;
+
+      // Execute the update query
       this.db.run(
         query,
         [
@@ -216,19 +236,15 @@ export class RepositoryImpl
         ],
         function (err) {
           if (err) {
-            console.error("Error en la consulta:", err);
-            return reject(err); // Rechazar la promesa si hay un error
+            console.error("Error during query:", err);
+            return reject(err); // Reject the promise if there is an error
           }
           if (this.changes > 0) {
-            console.log(
-              `Se actualizó correctamente ${this.changes} registro(s).`
-            );
-            resolve(true); // Resolver la promesa si se actualizó al menos un registro
+            console.log(`Successfully updated ${this.changes} record(s).`);
+            resolve(true); // Resolve true if records were updated
           } else {
-            console.log(
-              "No se encontró ningún registro con el idTurno especificado."
-            );
-            resolve(false); // Resolver la promesa aunque no se haya actualizado ningún registro
+            console.log("No record found with the specified idTurno.");
+            resolve(false); // Resolve false if no records were updated
           }
         }
       );

@@ -8,9 +8,7 @@ export interface AppointmentRepository {
     dateStart: string,
     dateEnd: string
   ): Promise<Appointment[] | null>;
-  countAppointment(idAppointment: string): Promise<number>;
-  saveAppointments(message: Message): Promise<boolean>;
-  updateAppointment(message: Message): Promise<boolean>;
+
   getApointmentsByDate(date: string): Promise<Message[]>;
   getApointmentsByDateFiltered(
     date: string,

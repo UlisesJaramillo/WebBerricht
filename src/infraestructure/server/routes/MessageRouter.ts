@@ -13,8 +13,13 @@ const router = Router();
 const repositoryImpl = new RepositoryImpl();
 const apiImpl = new ApiImpl();
 const appointmentService = new AppointmentService(repositoryImpl, apiImpl);
-const getAppointments = new GetAppointments(appointmentService, apiImpl);
+
 const messageService = new MessageService(repositoryImpl, apiImpl);
+const getAppointments = new GetAppointments(
+  appointmentService,
+  messageService,
+  apiImpl
+);
 const getResponse = new GetResponse(messageService, appointmentService);
 const getAppointmensDromDB = new GetAppointmentsFromDB(appointmentService);
 const sendSms = new SendSms(messageService, appointmentService);
