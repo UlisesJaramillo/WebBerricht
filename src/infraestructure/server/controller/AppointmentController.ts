@@ -1,22 +1,20 @@
-// src/controllers/messageController.ts
+// src/controllers/appointmentController.ts
 
 import { Request, Response } from "express";
 import { GetAppointments } from "../../../application/useCases/getAppointments";
 
 export class AppointmentController {
-  constructor(private getAppointments: GetAppointments) {
-    this.getAppointments = getAppointments;
-  }
+  constructor(private getAppointments: GetAppointments) {}
 
-  getAppointmentsController(req: Request, res: Response) {
+  async getAppointmentsController(req: Request, res: Response): Promise<void> {
     try {
       const date = req.params.fecha;
-      const data = this.getAppointments.execute(date);
+      const data = await this.getAppointments.execute(date); // Await the asynchronous method
 
       res.status(200).json({ ok: data });
     } catch (error) {
-      console.error("Error fetching messages:", error);
-      return res.status(500).json({ error: "Internal server error" });
+      console.error("Error fetching appointments:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
   }
 }

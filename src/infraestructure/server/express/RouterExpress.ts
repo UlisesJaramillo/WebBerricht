@@ -5,9 +5,12 @@ import messageRoutes from "../routes/MessageRouter";
 
 const routerExpress = Router();
 
-// Definir todas mis rutas principales
+// Define all main routes
 
+// Route for appointment-related requests
 routerExpress.use("/alephoo", appointmentRoutes);
+
+// Route for SMS-related requests
 routerExpress.use("/sms", messageRoutes);
 
 export default routerExpress;

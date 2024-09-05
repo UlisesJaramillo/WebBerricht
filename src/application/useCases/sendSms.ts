@@ -1,36 +1,38 @@
-import { response } from "express";
 import { AppointmentService } from "../../domain/services/AppointmentService";
 import { MessageService } from "../../domain/services/MessageService";
 import moment from "moment";
 import { Message } from "../../domain/entities/Message";
-import { environment } from "../../../environment";
+import { enviroments } from "../../../enviroments";
 import momenttimezone from "moment-timezone";
+
 export class SendSms {
   constructor(
     private messageService: MessageService,
     private appointmentService: AppointmentService
   ) {
     this.messageService = messageService;
-    console.log("clase creada: SendSms");
+    console.log("Class created: SendSms");
   }
 
+  // Method to send SMS messages for the given date
   async execute(date: string): Promise<Message[]> {
     const yesterday = moment().subtract(1, "days").format("YYYY-MM-DD");
 
-    // Obtenemos todos los mensajes de la base de datos filtrados por la fecha y limitados a ayer
+    // Retrieve all messages from the database filtered by the date and limited to yesterday
     const messages =
       await this.appointmentService.getAppointmentsFilteredFromDB(
         date,
         yesterday
       );
 
-    // Formateamos todos los mensajes
+    // Format all the messages for sending
     const formattedMessages = this.makeMessages(messages, "");
 
-    // Enviamos los mensajes
-    //const success = await this.messageService.sendSmsBlock(formattedMessages);
+    // Send the messages (Caution: This is currently set to always succeed)
+    // const success = await this.messageService.sendSmsBlock(formattedMessages);
     const success = true;
     if (success) {
+      // Set the appointment processing status with the current time in Buenos Aires timezone
       const argentinaTime = momenttimezone
         .tz("America/Argentina/Buenos_Aires")
         .format("YYYY-MM-DD HH:mm:ss");
@@ -40,6 +42,7 @@ export class SendSms {
     return messages;
   }
 
+  // Helper method to format messages for sending
   private makeMessages(data: Message[], message: string) {
     data.forEach((element) => {
       message +=
@@ -59,19 +62,21 @@ export class SendSms {
     });
     return message;
   }
+
   /**
-   * Convierte una fecha del formato YYYY-MM-DD al formato DD-MM-YYYY.
-   * @param {string} fecha - La fecha en formato YYYY-MM-DD.
-   * @returns {string} - La fecha en formato DD-MM-YYYY.
+   * Converts a date from YYYY-MM-DD format to DD-MM-YYYY format.
+   * @param {string} date - The date in YYYY-MM-DD format.
+   * @returns {string} - The date in DD-MM-YYYY format.
    */
   private convertirFecha(date: string) {
-    // Dividir la fecha en partes (año, mes, día)
+    // Split the date into year, month, and day parts
     const [year, month, day] = date.split("-");
 
-    // Formatear la fecha en el nuevo formato DD-MM-YYYY
+    // Format the date into the new DD-MM-YYYY format
     return `${day}-${month}-${year}`;
   }
 
+  // Helper method to replace placeholders in the message template with actual values
   private addTextFields = (
     medico_nombre: string,
     medico_apellido: string,
@@ -80,7 +85,7 @@ export class SendSms {
     turno_fecha: string,
     turno_hora: string
   ) => {
-    return environment.MSJ.replace("<medico_nombre>", medico_nombre)
+    return enviroments.MSJ.replace("<medico_nombre>", medico_nombre)
       .replace("<medico_apellido>", medico_apellido)
       .replace("<paciente_nombre>", paciente_nombre)
       .replace("<paciente_apellido>", paciente_apellido)
@@ -88,6 +93,7 @@ export class SendSms {
       .replace("<turno_hora>", turno_hora);
   };
 
+  // Helper method to normalize text by replacing accented characters and special symbols
   private normalizeText(text: string) {
     const accentsMap = new Map([
       ["á", "a"],
@@ -102,7 +108,7 @@ export class SendSms {
       ["Ú", "U"],
       ["ñ", "n"],
       ["Ñ", "N"],
-      // Añadir más si es necesario
+      // Add more if needed
     ]);
 
     const specialCharsMap = new Map([
@@ -112,18 +118,20 @@ export class SendSms {
       ["%", "porcentaje"],
       ["&", "Y"],
       ["*", "asterisco"],
-      // Añadir más si es necesario
+      // Add more if needed
     ]);
 
     let normalizedText = text;
 
+    // Replace accented characters with their non-accented counterparts
     accentsMap.forEach((value, key) => {
       const regex = new RegExp(key, "g");
       normalizedText = normalizedText.replace(regex, value);
     });
 
+    // Replace special characters with their textual representation
     specialCharsMap.forEach((value, key) => {
-      const regex = new RegExp(`\\${key}`, "g"); // Escapar caracteres especiales
+      const regex = new RegExp(`\\${key}`, "g"); // Escape special characters
       normalizedText = normalizedText.replace(regex, value);
     });
 

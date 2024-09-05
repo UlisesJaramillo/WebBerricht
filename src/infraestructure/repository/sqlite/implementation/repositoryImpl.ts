@@ -14,7 +14,11 @@ export class RepositoryImpl
     this.db = new sqlite3.Database("./database.db");
   }
 
-  // Retrieve the appointment ID based on the phone number
+  /**
+   * Retrieves the appointment ID based on the phone number.
+   * @param {string} phoneNumber - The phone number of the patient.
+   * @returns {Promise<string>} - A promise that resolves to the appointment ID.
+   */
   async getIdAppointment(phoneNumber: string): Promise<string> {
     return await new Promise((resolve, reject) => {
       this.db.all(
@@ -32,7 +36,12 @@ export class RepositoryImpl
     });
   }
 
-  // Retrieve appointments filtered by date and other conditions
+  /**
+   * Retrieves appointments filtered by date and other conditions.
+   * @param {string} date - The date to filter appointments.
+   * @param {string} yesterday - The comparison date to filter out older appointments.
+   * @returns {Promise<Message[]>} - A promise that resolves to an array of filtered appointments.
+   */
   async getApointmentsByDateFiltered(
     date: string,
     yesterday: string
@@ -58,7 +67,11 @@ export class RepositoryImpl
     }
   }
 
-  // Retrieve appointments based on a specific date
+  /**
+   * Retrieves appointments based on a specific date.
+   * @param {string} date - The date to filter appointments.
+   * @returns {Promise<Message[]>} - A promise that resolves to an array of appointments for the given date.
+   */
   async getApointmentsByDate(date: string): Promise<Message[]> {
     try {
       return await new Promise((resolve, reject) => {
@@ -81,7 +94,13 @@ export class RepositoryImpl
     }
   }
 
-  // Update the response for an appointment and patient based on phone number
+  /**
+   * Updates the response for an appointment and patient based on phone number.
+   * @param {string} cancelAppointment - Indicates if the appointment is canceled.
+   * @param {string} response - The response from the patient.
+   * @param {string} phoneNumber - The phone number of the patient.
+   * @returns {Promise<Boolean>} - A promise that resolves to a boolean indicating success or failure.
+   */
   async setResponse(
     cancelAppointment: string,
     response: string,
@@ -103,7 +122,12 @@ export class RepositoryImpl
     });
   }
 
-  // Set the process date for appointments matching the given criteria
+  /**
+   * Sets the process date for appointments matching the given criteria.
+   * @param {string} date - The date to filter appointments.
+   * @param {string} processDate - The date to set as the process date.
+   * @returns {Promise<boolean>} - A promise that resolves to a boolean indicating success or failure.
+   */
   async setProcessAppointment(
     date: string,
     processDate: string
@@ -129,7 +153,12 @@ export class RepositoryImpl
     }
   }
 
-  // Retrieve appointments between two dates
+  /**
+   * Retrieves appointments between two dates.
+   * @param {string} dateStart - The start date of the range.
+   * @param {string} dateEnd - The end date of the range.
+   * @returns {Promise<Appointment[] | null>} - A promise that resolves to an array of appointments within the date range or null if none found.
+   */
   async getAppointmentBetwenDate(
     dateStart: string,
     dateEnd: string
@@ -141,7 +170,11 @@ export class RepositoryImpl
     return apointments;
   }
 
-  // Count the number of messages associated with an appointment
+  /**
+   * Counts the number of messages associated with an appointment.
+   * @param {string} idAppointment - The ID of the appointment.
+   * @returns {Promise<number>} - A promise that resolves to the count of messages.
+   */
   countMessages(idAppointment: string): Promise<number> {
     return new Promise((resolve, reject) => {
       this.db.all(
@@ -159,7 +192,11 @@ export class RepositoryImpl
     });
   }
 
-  // Save a message to the database
+  /**
+   * Saves a message to the database.
+   * @param {Message} message - The message to be saved.
+   * @returns {Promise<boolean>} - A promise that resolves to a boolean indicating success or failure.
+   */
   async saveMessages(message: Message): Promise<boolean> {
     try {
       const query = `
@@ -192,7 +229,11 @@ export class RepositoryImpl
     return new Promise(() => true); // Return true if the message is saved successfully
   }
 
-  // Update a message's details, avoiding updates if patient data is unavailable
+  /**
+   * Updates a message's details, avoiding updates if patient data is unavailable.
+   * @param {Message} message - The message with updated details.
+   * @returns {Promise<boolean>} - A promise that resolves to a boolean indicating success or failure.
+   */
   updateMessage(message: Message): Promise<boolean> {
     return new Promise((resolve, reject) => {
       // Check if patient data contains unavailable values

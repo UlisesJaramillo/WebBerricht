@@ -10,35 +10,43 @@ import { GetAppointmentsFromDB } from "../../../application/useCases/getAppointm
 import { SendSms } from "../../../application/useCases/sendSms";
 
 const router = Router();
+
+// Instantiate repository, API, services, and use cases
 const repositoryImpl = new RepositoryImpl();
 const apiImpl = new ApiImpl();
 const appointmentService = new AppointmentService(repositoryImpl, apiImpl);
-
 const messageService = new MessageService(repositoryImpl, apiImpl);
+
+// Create instances of use cases
 const getAppointments = new GetAppointments(
   appointmentService,
   messageService,
   apiImpl
 );
 const getResponse = new GetResponse(messageService, appointmentService);
-const getAppointmensDromDB = new GetAppointmentsFromDB(appointmentService);
+const getAppointmentsFromDB = new GetAppointmentsFromDB(appointmentService);
 const sendSms = new SendSms(messageService, appointmentService);
+
+// Instantiate the controller with the use cases
 const messageController = new MessageController(
   getAppointments,
   getResponse,
-  getAppointmensDromDB,
+  getAppointmentsFromDB,
   sendSms
 );
 
-//Rutas para SMS
+// Define routes for SMS management
+// Route to send messages based on the date
 router.get("/enviarmensajes/:fecha", (req, res) => {
   messageController.sendMessagesController(req, res);
 });
 
+// Route to get responses based on phone number
 router.get("/respuesta/:numero", (req, res) => {
   messageController.getResponseController(req, res);
 });
 
+// Route to retrieve appointments from the database based on the date
 router.get("/entregarturnos/:fecha", (req, res) => {
   messageController.getAppointmentsFromDBController(req, res);
 });

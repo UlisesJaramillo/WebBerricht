@@ -10,49 +10,48 @@ export class MessageController {
   constructor(
     private getAppointments: GetAppointments,
     private getResponse: GetResponse,
-    private getAppointmensFromDB: GetAppointmentsFromDB,
+    private getAppointmentsFromDB: GetAppointmentsFromDB,
     private sendSms: SendSms
   ) {
-    this.getAppointments = getAppointments;
-    this.getResponse = getResponse;
-    console.log("clase creada: MessageController");
+    console.log("Clase creada: MessageController");
   }
 
-  getAppointmentsFromDBController(req: Request, res: Response) {
+  async getAppointmentsFromDBController(
+    req: Request,
+    res: Response
+  ): Promise<void> {
     const date = req.params.fecha;
     try {
-      this.getAppointmensFromDB.execute(date).then((data) => {
-        console.log(data);
-        res.status(200).json({ ok: "ok", respuesta: data });
-      });
+      const data = await this.getAppointmentsFromDB.execute(date); // Await the asynchronous method
+      console.log(data);
+      res.status(200).json({ ok: "ok", respuesta: data });
     } catch (error) {
-      console.error("Error fetching messages:", error);
-      return res.status(500).json({ error: "Internal server error" });
+      console.error("Error fetching appointments from DB:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
   }
 
-  sendMessagesController(req: Request, res: Response) {
+  async sendMessagesController(req: Request, res: Response): Promise<void> {
     const date = req.params.fecha;
     try {
-      this.sendSms.execute(date).then((data) => {
-        res.status(200).json({ ok: "ok", respuesta: data });
-      });
+      const data = await this.sendSms.execute(date); // Await the asynchronous method
+      res.status(200).json({ ok: "ok", respuesta: data });
     } catch (error) {
-      console.error("Error fetching messages:", error);
-      return res.status(500).json({ error: "Internal server error" });
+      console.error("Error sending messages:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
   }
 
-  getResponseController(req: Request, res: Response) {
+  async getResponseController(req: Request, res: Response): Promise<void> {
     const { numero } = req.params;
     const response: string = req.query.mensaje as string;
 
     try {
-      this.getResponse.execute(response, numero);
+      await this.getResponse.execute(response, numero); // Await the asynchronous method
       res.status(200).json({ ok: "ok" });
     } catch (error) {
-      console.error("Error fetching messages:", error);
-      return res.status(500).json({ error: "Internal server error" });
+      console.error("Error processing response:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
   }
 }

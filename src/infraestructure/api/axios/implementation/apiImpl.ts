@@ -5,9 +5,9 @@ import { MessageApi } from "../../../../domain/interfaces/MessageApi";
 import { Pacient } from "../../../../domain/entities/Pacient";
 import { Professional } from "../../../../domain/entities/Professional";
 import { EventEmitter } from "events";
-import { environment } from "../../../../../environment";
-const username = environment.USER;
-const password = environment.PASSWORD;
+import { enviroments } from "../../../../../enviroments";
+const username = enviroments.USER;
+const password = enviroments.PASSWORD;
 const basicAuth = "Basic " + btoa(username + ":" + password);
 
 export class ApiImpl
@@ -84,7 +84,7 @@ export class ApiImpl
       const config = {
         method: "get",
         maxBodyLength: Infinity,
-        url: `${environment.apiUrl}/admision/turnos?filter[fecha]=${date}&filter[nocancelado]=1`,
+        url: `${enviroments.URLAPI}/admision/turnos?filter[fecha]=${date}&filter[nocancelado]=1`,
         headers: {
           Authorization: basicAuth,
           Cookie: "ci_session=5ii3jc9v79j7i0o2s98o4bb14mishs4b",
@@ -158,7 +158,7 @@ export class ApiImpl
     const config = {
       method: "get",
       maxBodyLength: Infinity,
-      url: environment.apiUrl + `/admision/turnos/${idTurno}`,
+      url: enviroments.URLAPI + `/admision/turnos/${idTurno}`,
       headers: {
         Authorization: basicAuth,
         Cookie: "ci_session=f44jgof0hv5novb696cnfhgkq21mop3a",
@@ -176,7 +176,7 @@ export class ApiImpl
       const configPost = {
         method: "put",
         maxBodyLength: Infinity,
-        url: environment.apiUrl + `/admision/turnos/${idTurno}`,
+        url: enviroments.URLAPI + `/admision/turnos/${idTurno}`,
         headers: {
           Authorization: basicAuth,
           Cookie: "ci_session=f44jgof0hv5novb696cnfhgkq21mop3a",

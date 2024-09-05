@@ -7,6 +7,8 @@ import { ApiImpl } from "../../api/axios/implementation/apiImpl";
 import { MessageService } from "../../../domain/services/MessageService";
 
 const router = Router();
+
+// Instantiate repository, API, services, and use cases
 const repositoryImpl = new RepositoryImpl();
 const apiImpl = new ApiImpl();
 const messageService = new MessageService(repositoryImpl, apiImpl);
@@ -16,9 +18,12 @@ const getAppointment: GetAppointments = new GetAppointments(
   messageService,
   apiImpl
 );
+
+// Instantiate the controller with the use case
 const appointmentController = new AppointmentController(getAppointment);
 
-// Rutas para ALEPHOO
+// Define routes for appointment management
+// Route to get appointments by date
 router.get("/obtenerTurnos/:fecha", (req, res) => {
   appointmentController.getAppointmentsController(req, res);
 });

@@ -5,53 +5,60 @@ import { ApiImpl } from "../../infraestructure/api/axios/implementation/apiImpl"
 
 export class GetAppointments {
   constructor(
-    private appointmentService: AppointmentService,
-    private messageService: MessageService,
-    private api: ApiImpl
+    private appointmentService: AppointmentService, // Service for handling appointment-related operations
+    private messageService: MessageService, // Service for handling message-related operations
+    private api: ApiImpl // API implementation for making requests
   ) {
-    console.log("clase creada: GetAppointments");
+    console.log("Class created: GetAppointments");
   }
 
+  // Method to execute the retrieval and processing of appointments
   async execute(date: string): Promise<void> {
-    const appments = await this.appointmentService.getPatient(
+    // Retrieve appointments for the given date and get patient details
+    const appointments = await this.appointmentService.getPatient(
       await this.appointmentService.getAppointmentsDate(date)
     );
 
-    appments.forEach(async (appment) => {
-      const profesionalName =
-        appment.professional?.name || "Nombre no disponible";
-      const profesionalLastname =
-        appment.professional?.lastname || "Apellido no disponible";
-      const pacientePhoneNumber =
-        appment.paciente?.phoneNumber || "teléfono no disponible";
-      const pacienteName = appment.paciente?.name || "nombre no disponible";
-      const pacienteLastname =
-        appment.paciente?.lastname || "apellido no disponible";
+    // Process each appointment
+    appointments.forEach(async (appointment) => {
+      // Extract professional and patient details, or use default values if not available
+      const professionalName =
+        appointment.professional?.name || "Name not available";
+      const professionalLastname =
+        appointment.professional?.lastname || "Lastname not available";
+      const patientPhoneNumber =
+        appointment.paciente?.phoneNumber || "phone number not available";
+      const patientName = appointment.paciente?.name || "name not available";
+      const patientLastname =
+        appointment.paciente?.lastname || "lastname not available";
 
+      // Create a new message object with the appointment details
       const message = new Message(
-        appment.id,
-        pacientePhoneNumber,
-        appment.fecha,
-        appment.hora,
-        appment.motivo,
-        pacienteName,
-        pacienteLastname,
-        profesionalName,
-        profesionalLastname
+        appointment.id,
+        patientPhoneNumber,
+        appointment.fecha,
+        appointment.hora,
+        appointment.motivo,
+        patientName,
+        patientLastname,
+        professionalName,
+        professionalLastname
       );
-      //hacemos un conteo para verificar la existencia el turno
 
+      // Check if the appointment already exists in the database
       if ((await this.messageService.countMessages(message.idTurno)) === 0) {
-        //si el turno no existe
-        // Guardar el turno y el mensaje en la base de datos
+        // If the appointment does not exist, save the message in the database
         await this.messageService.saveMessages(message);
-        console.log("Turnoguardado en la base de datos");
+        console.log("Appointment saved in the database");
       } else {
-        //si el turno existe actualizamos el registro
+        // If the appointment exists, update the existing record
         await this.messageService.updateMessage(message);
-        //await this.appointmentService.updateAppointment(message);
+        // Optionally, update the appointment details as well
+        // await this.appointmentService.updateAppointment(message);
       }
     });
-    console.log(appments);
+
+    // Log the processed appointments
+    console.log(appointments);
   }
 }
