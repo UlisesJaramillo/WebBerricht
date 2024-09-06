@@ -8,14 +8,16 @@ import { GetResponse } from "../../../application/useCases/getResponse";
 import { MessageService } from "../../../domain/services/MessageService";
 import { GetAppointmentsFromDB } from "../../../application/useCases/getAppointmentsFromDB";
 import { SendSms } from "../../../application/useCases/sendSms";
+import { IAImpl } from "../../IA/Implementation/IAImpl";
 
 const router = Router();
 
 // Instantiate repository, API, services, and use cases
 const repositoryImpl = new RepositoryImpl();
 const apiImpl = new ApiImpl();
+const iaImpl = new IAImpl();
 const appointmentService = new AppointmentService(repositoryImpl, apiImpl);
-const messageService = new MessageService(repositoryImpl, apiImpl);
+const messageService = new MessageService(repositoryImpl, apiImpl, iaImpl);
 
 // Create instances of use cases
 const getAppointments = new GetAppointments(

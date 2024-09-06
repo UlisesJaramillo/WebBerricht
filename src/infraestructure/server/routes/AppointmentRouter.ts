@@ -5,13 +5,15 @@ import { AppointmentService } from "../../../domain/services/AppointmentService"
 import { RepositoryImpl } from "../../repository/sqlite/implementation/repositoryImpl";
 import { ApiImpl } from "../../api/axios/implementation/apiImpl";
 import { MessageService } from "../../../domain/services/MessageService";
+import { IAImpl } from "../../IA/Implementation/IAImpl";
 
 const router = Router();
 
 // Instantiate repository, API, services, and use cases
 const repositoryImpl = new RepositoryImpl();
 const apiImpl = new ApiImpl();
-const messageService = new MessageService(repositoryImpl, apiImpl);
+const iaImpl = new IAImpl();
+const messageService = new MessageService(repositoryImpl, apiImpl, iaImpl);
 const appointmentService = new AppointmentService(repositoryImpl, apiImpl);
 const getAppointment: GetAppointments = new GetAppointments(
   appointmentService,

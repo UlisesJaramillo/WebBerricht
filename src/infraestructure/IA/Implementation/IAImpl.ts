@@ -23,7 +23,7 @@ export class IAImpl implements MessageIA {
     Clasificación:`;
     try {
       const response = await this.openai.completions.create({
-        model: "gpt-3.5-turbo-0125", // O el modelo que prefieras
+        model: "gpt-3.5-turbo", // O el modelo que prefieras
         prompt: prompt,
         max_tokens: 100,
         temperature: 0,

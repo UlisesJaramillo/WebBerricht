@@ -23,7 +23,7 @@ export class RepositoryImpl
     return await new Promise((resolve, reject) => {
       this.db.all(
         `SELECT idTurno FROM messages WHERE id_message=(SELECT id_message FROM messages WHERE paciente_celular = ? ORDER BY fecha_procesado DESC LIMIT 1)`,
-        [`%${phoneNumber}%`],
+        [phoneNumber],
         (err, rows: Message[]) => {
           if (err) {
             console.error("Error during query:", err);
@@ -102,13 +102,15 @@ export class RepositoryImpl
    * @returns {Promise<Boolean>} - A promise that resolves to a boolean indicating success or failure.
    */
   async setResponse(
-    cancelAppointment: string,
+    cancelado: string,
     response: string,
     phoneNumber: string
   ): Promise<Boolean> {
+    // Construct the update query for the cancellation status
+    const cancelaTurno = cancelado ? `cancela_turno = '${cancelado}', ` : "";
     return await new Promise((resolve, reject) => {
       this.db.all(
-        `UPDATE messages SET fecha_respuesta = datetime('now','localtime'), ${cancelAppointment}  mensaje_paciente='${response}' WHERE id_message=(SELECT id_message FROM messages WHERE paciente_celular='${phoneNumber}' ORDER BY fecha_procesado DESC LIMIT 1)`,
+        `UPDATE messages SET fecha_respuesta = datetime('now','localtime'), ${cancelaTurno}  mensaje_paciente='${response}' WHERE id_message=(SELECT id_message FROM messages WHERE paciente_celular='${phoneNumber}' ORDER BY fecha_procesado DESC LIMIT 1)`,
         [],
         (err, rows: Message[]) => {
           if (err) {
