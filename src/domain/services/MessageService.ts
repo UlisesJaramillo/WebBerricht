@@ -1,11 +1,13 @@
 import { Message } from "../entities/Message";
 import { MessageApi } from "../interfaces/MessageApi";
 import { MessageRepository } from "../interfaces/MessageRepository";
+import { MessageIA } from "../interfaces/MessagesIA";
 
 export class MessageService {
   constructor(
     private messageRepository: MessageRepository,
-    private messageApi: MessageApi
+    private messageApi: MessageApi,
+    private messageIA: MessageIA
   ) {
     console.log("Service created: MessageService");
   }
@@ -72,5 +74,9 @@ export class MessageService {
    */
   async saveMessages(messages: Message): Promise<boolean> {
     return await this.messageRepository.saveMessages(messages);
+  }
+
+  async analizeMessage(message: string): Promise<string> {
+    return await this.messageIA.analizeMessage(message);
   }
 }

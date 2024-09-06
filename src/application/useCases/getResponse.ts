@@ -12,8 +12,9 @@ export class GetResponse {
   // Method to handle the response from the patient and manage the appointment accordingly
   async execute(response: string, phoneNumber: string) {
     let cancelado = ""; // Variable to store the cancellation status
-    let respuestaAux = response.replace(/ /g, "").toLowerCase(); // Normalize response for comparison
+    let respuestaAux: string = response.replace(/ /g, "").toLowerCase(); // Normalize response for comparison
 
+    respuestaAux = await this.messageService.analizeMessage(response); //analiza por IA la respuesta
     // Check if the response indicates a cancellation
     if (["si", "sí", "SI", "Si"].includes(respuestaAux)) {
       cancelado = "si";
