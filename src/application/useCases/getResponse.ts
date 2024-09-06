@@ -12,11 +12,12 @@ export class GetResponse {
   // Method to handle the response from the patient and manage the appointment accordingly
   async execute(response: string, phoneNumber: string) {
     let cancelado = ""; // Variable to store the cancellation status
-    let respuestaAux: string = response.replace(/ /g, "").toLowerCase(); // Normalize response for comparison
+    let respuestaAux: string = ""; // Normalize response for comparison
 
     //check if is already a response like NO in the DB
+
     //respuestaAux = await this.messageService.analizeMessage(response); //Analize the response by AI
-    respuestaAux = this.evaluarRespuestaPaciente(response);
+    respuestaAux = this.evaluatePatiencResponse(response);
     console.log(respuestaAux);
     // Check if the response indicates a cancellation
     if (["si", "sí", "SI", "Si"].includes(respuestaAux)) {
@@ -42,8 +43,8 @@ export class GetResponse {
       this.appointmentService.cancelAppointment(idAppointment);
     }
   }
-  respuestasPaciente = {
-    SI: [
+  patientResponses = {
+    NO: [
       "sí, quiero cancelar el turno",
       "cancelo el turno",
       "quiero cancelar mi cita",
@@ -54,8 +55,11 @@ export class GetResponse {
       "sí, no voy a ir",
       "por favor, anulen mi cita",
       "no podré ir, cancelo",
+      "NO",
+      "no",
+      "No",
     ],
-    NO: [
+    SI: [
       "no, mantengo el turno",
       "no quiero cancelar",
       "quiero asistir a mi cita",
@@ -66,6 +70,10 @@ export class GetResponse {
       "no, no quiero cancelar",
       "asistiré a mi turno",
       "confirmo que asistiré",
+      "si",
+      "sí",
+      "SI",
+      "Si",
     ],
     INDEFINIDO: [
       "no estoy seguro",
@@ -82,30 +90,30 @@ export class GetResponse {
   };
 
   // Función que evalúa el mensaje del paciente y devuelve "SI", "NO" o "INDEFINIDO"
-  private evaluarRespuestaPaciente(mensaje: string): string {
+  private evaluatePatiencResponse(mensaje: string): string {
     // Convertir el mensaje a minúsculas para comparaciones case-insensitive
     const mensajeLower = mensaje.toLowerCase().trim();
 
     // Buscar en las listas de respuestas
     if (
-      this.respuestasPaciente.SI.some((respuesta) =>
-        mensajeLower.includes(respuesta)
+      this.patientResponses.SI.some((response) =>
+        mensajeLower.includes(response)
       )
     ) {
       return "SI";
     }
 
     if (
-      this.respuestasPaciente.NO.some((respuesta) =>
-        mensajeLower.includes(respuesta)
+      this.patientResponses.NO.some((response) =>
+        mensajeLower.includes(response)
       )
     ) {
       return "NO";
     }
 
     if (
-      this.respuestasPaciente.INDEFINIDO.some((respuesta) =>
-        mensajeLower.includes(respuesta)
+      this.patientResponses.INDEFINIDO.some((response) =>
+        mensajeLower.includes(response)
       )
     ) {
       return "INDEFINIDO";
