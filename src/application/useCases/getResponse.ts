@@ -12,23 +12,29 @@ export class GetResponse {
   // Method to handle the response from the patient and manage the appointment accordingly
   async execute(response: string, phoneNumber: string) {
     let cancelado = ""; // Variable to store the cancellation status
-    let respuestaAux: string = ""; // Normalize response for comparison
+    let respuestaAux: string = response.replace(/\s+/g, "").toLowerCase(); // Normalize response for comparison
 
     //check if is already a response like NO in the DB
-
-    //respuestaAux = await this.messageService.analizeMessage(response); //Analize the response by AI
-    respuestaAux = this.evaluatePatiencResponse(response);
     console.log(respuestaAux);
     // Check if the response indicates a cancellation
-    if (["si", "sí", "SI", "Si"].includes(respuestaAux)) {
+    if (
+      ["si", "sí", "SI", "Si"].some((item) => {
+        item == respuestaAux;
+      })
+    ) {
       cancelado = "si";
-    }
-
-    // Check if the response indicates no cancellation
-    if (["no", "NO", "No"].includes(respuestaAux)) {
+    } else if (
+      ["no", "NO", "No"].some((item) => {
+        item == respuestaAux;
+      })
+    ) {
+      // Check if the response indicates no cancellation
       cancelado = "no";
+    } else {
+      //respuestaAux = await this.messageService.analizeMessage(response); //Analize the response by AI
+      response = this.evaluatePatiencResponse(response); // we use a local function with pre-defined responses
     }
-
+    console.log(response);
     // Determine if the appointment should be canceled based on the response
     // Save the response in the message service
     this.messageService.setResponse(cancelado, response, phoneNumber);
@@ -95,25 +101,17 @@ export class GetResponse {
     const mensajeLower = mensaje.toLowerCase().trim();
 
     // Buscar en las listas de respuestas
-    if (
-      this.patientResponses.SI.some((response) =>
-        mensajeLower.includes(response)
-      )
-    ) {
+    if (this.patientResponses.SI.some((response) => mensajeLower == response)) {
       return "SI";
     }
 
-    if (
-      this.patientResponses.NO.some((response) =>
-        mensajeLower.includes(response)
-      )
-    ) {
+    if (this.patientResponses.NO.some((response) => mensajeLower == response)) {
       return "NO";
     }
 
     if (
-      this.patientResponses.INDEFINIDO.some((response) =>
-        mensajeLower.includes(response)
+      this.patientResponses.INDEFINIDO.some(
+        (response) => mensajeLower == response
       )
     ) {
       return "INDEFINIDO";

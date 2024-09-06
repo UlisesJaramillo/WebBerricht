@@ -29,8 +29,8 @@ export class SendSms {
     const formattedMessages = this.makeMessages(messages, "");
 
     // Send the messages (Caution: This is currently set to always succeed)
-    // const success = await this.messageService.sendSmsBlock(formattedMessages);
-    const success = true;
+    const success = await this.messageService.sendSmsBlock(formattedMessages);
+    //const success = true;
     if (success) {
       // Set the appointment processing status with the current time in Buenos Aires timezone
       const argentinaTime = momenttimezone

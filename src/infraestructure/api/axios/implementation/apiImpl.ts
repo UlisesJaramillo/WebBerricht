@@ -6,6 +6,7 @@ import { Pacient } from "../../../../domain/entities/Pacient";
 import { Professional } from "../../../../domain/entities/Professional";
 import { EventEmitter } from "events";
 import { enviroments } from "../../../../../enviroments";
+import qs from "qs";
 const username = enviroments.USER;
 const password = enviroments.PASSWORD;
 const basicAuth = "Basic " + btoa(username + ":" + password);
@@ -193,14 +194,42 @@ export class ApiImpl
   }
 
   /**
-   * Placeholder for sending an SMS block.
-   * Currently not implemented.
+   * Sends a block of SMS messages.
    *
    * @param {string} messages - The message block to send.
-   * @returns {Promise<boolean>} - Throws an error indicating the method is not implemented.
+   * @returns {Promise<boolean>} - Resolves to true if the operation was successful, otherwise false.
    */
-  sendSmsBlock(messages: string): Promise<boolean> {
-    throw new Error("Method not implemented.");
+  async sendSmsBlock(messages: string): Promise<boolean> {
+    const data = qs.stringify({
+      usuario: enviroments.SMS_MASIVO_USER,
+      clave: enviroments.SMS_MASIVO_PASSWORD,
+      bloque: messages,
+    });
+
+    const config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: enviroments.SMS_MASIVO_URL,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      data: data,
+    };
+
+    try {
+      const response = await axios(config);
+
+      if (response.data === "OK") {
+        console.log("Message sent successfully");
+        return true;
+      } else {
+        console.log("Failed to send message");
+        return false;
+      }
+    } catch (error) {
+      console.error("Axios request error:", error);
+      return false;
+    }
   }
 
   /**
