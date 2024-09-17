@@ -112,11 +112,16 @@ export class ApiImpl
             included
           );
 
+          const sede = this.obtenerSede(appointment, included);
+
+          //obtenerSede
+
           // Create a new Appointment object
           return new Appointment(
             idTurno,
             appointment.attributes.fecha,
             appointment.attributes.hora,
+            sede,
             null,
             professional,
             "",
@@ -283,5 +288,55 @@ export class ApiImpl
    */
   private findPersonById(data: any[], id: any, type: string) {
     return data.find((item) => item.type === type && item.id === id);
+  }
+
+  /**
+   * Retrieves the institution (sede) where the appointment is held.
+   *
+   * @param {object} turno - The appointment object containing relationships.
+   * @param {array} included - Additional data included in the API response.
+   * @returns {string} - The name of the institution (sede).
+   */
+  private obtenerSede(turno: any, included: any): string {
+    // Find the agenda associated with the appointment
+    let agendaId = turno.relationships.agenda.data.id;
+
+    // Find the agenda in the included data
+    let agenda = this.findById(included, agendaId, "Admision\\Agenda");
+
+    if (!agenda) {
+      return "";
+    }
+
+    // Get the institution (sede) ID from the agenda relationships
+    let institucionId = agenda.relationships.institucion.data.id;
+
+    // Find the institution in the included data
+    let institucion = this.findById(
+      included,
+      institucionId,
+      "Admin\\Institucion"
+    );
+
+    if (!institucion) {
+      return "";
+    }
+
+    // Return the name of the institution
+    return institucion.attributes.nombre;
+  }
+
+  /**
+   * Helper method to find an entity by ID and type in the included array.
+   *
+   * @param {array} included - The included data from the API response.
+   * @param {string} id - The ID of the entity to find.
+   * @param {string} type - The type of the entity to find.
+   * @returns {object} - The entity if found, or null if not found.
+   */
+  private findById(included: any[], id: string, type: string): any {
+    return (
+      included.find((item: any) => item.id === id && item.type === type) || null
+    );
   }
 }

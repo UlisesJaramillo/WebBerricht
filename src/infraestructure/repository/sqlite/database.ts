@@ -7,7 +7,7 @@ import sqlite3 from "sqlite3";
 export const initializeDB = async (): Promise<sqlite3.Database> => {
   return new Promise((resolve, reject) => {
     // Open the SQLite database
-    const db = new sqlite3.Database("./database.db", (err) => {
+    const db = new sqlite3.Database("./turnosDB.db", (err) => {
       if (err) {
         console.error("Error opening the database:", err.message);
         reject(err); // Reject the promise if there's an error opening the database
@@ -25,6 +25,7 @@ export const initializeDB = async (): Promise<sqlite3.Database> => {
             medico_apellido TEXT,
             turno_fecha TEXT,
             turno_hora TEXT,
+            turno_sede TEXT,
             paciente_celular TEXT,
             motivo TEXT,
             fecha_procesado TEXT,

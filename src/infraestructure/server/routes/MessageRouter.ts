@@ -9,6 +9,7 @@ import { MessageService } from "../../../domain/services/MessageService";
 import { GetAppointmentsFromDB } from "../../../application/useCases/getAppointmentsFromDB";
 import { SendSms } from "../../../application/useCases/sendSms";
 import { IAImpl } from "../../IA/Implementation/IAImpl";
+import { GetAppointmentsBetweenDates } from "../../../application/useCases/getAppointmentsBetweenDates";
 
 const router = Router();
 
@@ -28,13 +29,17 @@ const getAppointments = new GetAppointments(
 const getResponse = new GetResponse(messageService, appointmentService);
 const getAppointmentsFromDB = new GetAppointmentsFromDB(appointmentService);
 const sendSms = new SendSms(messageService, appointmentService);
+const getAppointmentBetweenDates = new GetAppointmentsBetweenDates(
+  messageService
+);
 
 // Instantiate the controller with the use cases
 const messageController = new MessageController(
   getAppointments,
   getResponse,
   getAppointmentsFromDB,
-  sendSms
+  sendSms,
+  getAppointmentBetweenDates
 );
 
 // Define routes for SMS management
@@ -51,6 +56,10 @@ router.get("/respuesta/:numero", (req, res) => {
 // Route to retrieve appointments from the database based on the date
 router.get("/entregarturnos/:fecha", (req, res) => {
   messageController.getAppointmentsFromDBController(req, res);
+});
+//consultarturnos?dateStart=2024-09-18&dateEnd=2024-09-20
+router.get("/consultarturnos", (req, res) => {
+  messageController.getAppointmentsBetweenDatesController(req, res);
 });
 
 export default router;

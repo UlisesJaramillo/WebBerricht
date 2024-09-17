@@ -10,4 +10,8 @@ export interface MessageRepository {
   updateMessage(message: Message): Promise<boolean>;
   countMessages(idAppointment: string): Promise<number>;
   saveMessages(message: Message): Promise<boolean>;
+  getAppointmentBetweenDate(
+    dateStart: string,
+    dateEnd: string
+  ): Promise<Message[]>;
 }

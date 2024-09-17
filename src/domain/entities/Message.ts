@@ -6,6 +6,7 @@ export class Message {
     public paciente_celular: string,
     public turno_fecha: string,
     public turno_hora: string,
+    public turno_sede: string,
     public motivo: string,
     public paciente_nombre: string,
     public paciente_apellido: string,
@@ -17,7 +18,7 @@ export class Message {
   ) {}
 
   // Helper method to format messages for sending
-  public makeMessage() {
+  public makeMessage(): string {
     const message =
       this.paciente_celular +
       "," +
@@ -29,7 +30,8 @@ export class Message {
         this.normalizeText(this.paciente_nombre),
         this.normalizeText(this.paciente_apellido),
         this.convertirFecha(this.turno_fecha),
-        this.turno_hora
+        this.turno_hora,
+        this.turno_sede
       ) +
       "\n";
 
@@ -56,14 +58,16 @@ export class Message {
     paciente_nombre: string,
     paciente_apellido: string,
     turno_fecha: string,
-    turno_hora: string
+    turno_hora: string,
+    turno_sede: string
   ) => {
     return enviroments.MSJ.replace("<medico_nombre>", medico_nombre)
       .replace("<medico_apellido>", medico_apellido)
       .replace("<paciente_nombre>", paciente_nombre)
       .replace("<paciente_apellido>", paciente_apellido)
       .replace("<turno_fecha>", turno_fecha)
-      .replace("<turno_hora>", turno_hora);
+      .replace("<turno_hora>", turno_hora)
+      .replace("<turno_sede>", turno_sede);
   };
 
   // Helper method to normalize text by replacing accented characters and special symbols

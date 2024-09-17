@@ -1,3 +1,4 @@
+import { enviroments } from "../../../enviroments";
 import { Message } from "../../domain/entities/Message";
 import { AppointmentService } from "../../domain/services/AppointmentService";
 import { MessageService } from "../../domain/services/MessageService";
@@ -19,8 +20,13 @@ export class GetAppointments {
       await this.appointmentService.getAppointmentsDate(date)
     );
 
+    const filteredAppointments = appointments.filter(
+      (appointment) =>
+        !appointment.isDiscarted(enviroments.DISCARTED_PROFESSIONALS)
+    );
+
     // Process each appointment
-    appointments.forEach(async (appointment) => {
+    filteredAppointments.forEach(async (appointment) => {
       // Extract professional and patient details, or use default values if not available
       const professionalName =
         appointment.professional?.name || "Name not available";
@@ -38,6 +44,7 @@ export class GetAppointments {
         patientPhoneNumber,
         appointment.fecha,
         appointment.hora,
+        appointment.sede,
         appointment.motivo,
         patientName,
         patientLastname,

@@ -11,7 +11,7 @@ export class RepositoryImpl
 
   constructor() {
     // Initialize the SQLite database connection
-    this.db = new sqlite3.Database("./database.db");
+    this.db = new sqlite3.Database("./turnosDB.db");
   }
 
   /**
@@ -137,7 +137,7 @@ export class RepositoryImpl
     try {
       return await new Promise((resolve, reject) => {
         this.db.all(
-          `UPDATE messages SET fecha_procesado = ? WHERE fecha_procesado IS NULL AND paciente_nombre NOT LIKE 'null' AND paciente_apellido NOT LIKE 'null' AND paciente_celular NOT LIKE 'null' AND medico_nombre NOT LIKE 'undefined' AND medico_apellido NOT LIKE 'undefined' AND turno_fecha LIKE ?;`,
+          `UPDATE messages SET fecha_procesado = ? WHERE fecha_procesado IS NULL AND paciente_nombre NOT LIKE 'name not available' AND paciente_apellido NOT LIKE 'lastname not available' AND paciente_celular NOT LIKE 'phone number not available' AND medico_nombre NOT NULL AND medico_apellido NOT NULL AND turno_fecha LIKE ?;`,
           [processDate, date],
           (err, rows: Message[]) => {
             if (err) {
@@ -156,20 +156,28 @@ export class RepositoryImpl
   }
 
   /**
-   * Retrieves appointments between two dates.
-   * @param {string} dateStart - The start date of the range.
-   * @param {string} dateEnd - The end date of the range.
-   * @returns {Promise<Appointment[] | null>} - A promise that resolves to an array of appointments within the date range or null if none found.
+   * Retrieves messages (appointments) between two specified dates.
+   * @param {string} dateStart - The start date of the range (inclusive).
+   * @param {string} dateEnd - The end date of the range (inclusive).
+   * @returns {Promise<Message[]>} - A promise that resolves to an array of messages within the date range or an empty array if none are found.
    */
-  async getAppointmentBetwenDate(
+  async getAppointmentBetweenDate(
     dateStart: string,
     dateEnd: string
-  ): Promise<Appointment[] | null> {
-    const apointments: Appointment[] = [];
-    console.log("Inside the repository");
-
-    console.log(apointments);
-    return apointments;
+  ): Promise<Message[]> {
+    return new Promise((resolve, reject) => {
+      this.db.all(
+        "SELECT * FROM messages WHERE turno_fecha >= ? AND turno_fecha <= ?",
+        [dateStart, dateEnd],
+        (err, rows: Message[]) => {
+          if (err) {
+            console.error("Error during query:", err);
+            return reject(err); // Reject the promise if there is an error
+          }
+          resolve(rows); // Resolve with the count of messages
+        }
+      );
+    });
   }
 
   /**
@@ -187,7 +195,7 @@ export class RepositoryImpl
             console.error("Error during query:", err);
             return reject(err); // Reject the promise if there is an error
           }
-          console.log("Query successful:", row[0].count);
+          //console.log("Query successful:", row[0].count);
           resolve(row[0].count); // Resolve with the count of messages
         }
       );
@@ -208,11 +216,12 @@ export class RepositoryImpl
         medico_nombre, 
         medico_apellido, 
         turno_fecha, 
-        turno_hora, 
+        turno_hora,
+        turno_sede, 
         paciente_celular, 
         idTurno
       ) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
       this.db.run(query, [
@@ -222,6 +231,7 @@ export class RepositoryImpl
         message.medico_apellido,
         message.turno_fecha,
         message.turno_hora,
+        message.turno_sede,
         message.paciente_celular,
         message.idTurno,
       ]);
@@ -259,7 +269,8 @@ export class RepositoryImpl
         medico_nombre = ?, 
         medico_apellido = ?, 
         turno_fecha = ?, 
-        turno_hora = ?, 
+        turno_hora = ?,
+        turno_sede = ?, 
         paciente_celular = ?
       WHERE idTurno = ?
     `;
@@ -274,6 +285,7 @@ export class RepositoryImpl
           message.medico_apellido,
           message.turno_fecha,
           message.turno_hora,
+          message.turno_sede,
           message.paciente_celular,
           message.idTurno,
         ],
@@ -283,7 +295,7 @@ export class RepositoryImpl
             return reject(err); // Reject the promise if there is an error
           }
           if (this.changes > 0) {
-            console.log(`Successfully updated ${this.changes} record(s).`);
+            //console.log(`Successfully updated ${this.changes} record(s).`);
             resolve(true); // Resolve true if records were updated
           } else {
             console.log("No record found with the specified idTurno.");

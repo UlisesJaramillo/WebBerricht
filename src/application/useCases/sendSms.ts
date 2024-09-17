@@ -2,7 +2,6 @@ import { AppointmentService } from "../../domain/services/AppointmentService";
 import { MessageService } from "../../domain/services/MessageService";
 import moment from "moment";
 import { Message } from "../../domain/entities/Message";
-import { enviroments } from "../../../enviroments";
 import momenttimezone from "moment-timezone";
 
 export class SendSms {
@@ -29,7 +28,7 @@ export class SendSms {
     let formattedMessages = "";
 
     messages.forEach((message) => {
-      formattedMessages += message.makeMessage();
+      formattedMessages += message.makeMessage;
     });
 
     // Send the messages (Caution: This is currently set to always succeed)

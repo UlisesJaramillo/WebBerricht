@@ -5,13 +5,15 @@ import { GetAppointments } from "../../../application/useCases/getAppointments";
 import { GetResponse } from "../../../application/useCases/getResponse";
 import { GetAppointmentsFromDB } from "../../../application/useCases/getAppointmentsFromDB";
 import { SendSms } from "../../../application/useCases/sendSms";
+import { GetAppointmentsBetweenDates } from "../../../application/useCases/getAppointmentsBetweenDates";
 
 export class MessageController {
   constructor(
     private getAppointments: GetAppointments,
     private getResponse: GetResponse,
     private getAppointmentsFromDB: GetAppointmentsFromDB,
-    private sendSms: SendSms
+    private sendSms: SendSms,
+    private getAppointmentBetweenDates: GetAppointmentsBetweenDates
   ) {
     console.log("Clase creada: MessageController");
   }
@@ -49,6 +51,25 @@ export class MessageController {
     try {
       await this.getResponse.execute(response, numero); // Await the asynchronous method
       res.status(200).json({ ok: "ok" });
+    } catch (error) {
+      console.error("Error processing response:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+
+  async getAppointmentsBetweenDatesController(
+    req: Request,
+    res: Response
+  ): Promise<void> {
+    const dateStart: string = req.query.dateStart as string;
+    const dateEnd: string = req.query.dateEnd as string;
+
+    try {
+      const response = await this.getAppointmentBetweenDates.execute(
+        dateStart,
+        dateEnd
+      );
+      res.status(200).json({ ok: "ok", respuesta: response });
     } catch (error) {
       console.error("Error processing response:", error);
       res.status(500).json({ error: "Internal server error" });

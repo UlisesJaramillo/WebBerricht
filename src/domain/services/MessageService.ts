@@ -79,4 +79,19 @@ export class MessageService {
   async analizeMessage(message: string): Promise<string> {
     return await this.messageIA.analizeMessage(message);
   }
+
+  /**
+   * Retrieves appointments from the API for a specific date.
+   * @param {string} date - The date for which to retrieve appointments.
+   * @returns {Promise<Appointment[]>} - A promise that resolves to a list of appointments.
+   */
+  async getAppointmentsBetweenDate(
+    dateStart: string,
+    dateEnd: string
+  ): Promise<Message[]> {
+    return await this.messageRepository.getAppointmentBetweenDate(
+      dateStart,
+      dateEnd
+    );
+  }
 }

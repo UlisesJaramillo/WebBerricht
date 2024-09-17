@@ -15,7 +15,7 @@ export class GetResponse {
     let respuestaAux: string = response.replace(/\s+/g, "").toLowerCase(); // Normalize response for comparison
 
     //check if is already a response like NO in the DB
-    console.log(respuestaAux);
+    //console.log(respuestaAux);
     // Check if the response indicates a cancellation
     if (
       ["si", "sí", "SI", "Si"].some((item) => {
@@ -34,7 +34,7 @@ export class GetResponse {
       //respuestaAux = await this.messageService.analizeMessage(response); //Analize the response by AI
       response = this.evaluatePatiencResponse(response); // we use a local function with pre-defined responses
     }
-    console.log(response);
+    //console.log(response);
     // Determine if the appointment should be canceled based on the response
     // Save the response in the message service
     this.messageService.setResponse(cancelado, response, phoneNumber);
